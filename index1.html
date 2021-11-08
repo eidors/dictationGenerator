@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dictation Generator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="js/FileSaver.js"></script>
+    <script src="js/七上.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <button type="button" class="btn btn-primary creatDB">
+            创建库
+        </button>
+
+        <button type="button" class="btn btn-primary creatGuShi">
+            生成古诗默写
+        </button>
+
+
+    </div>
+    <script>
+        $(".creatDB").click(function() {
+            window.location.href = "建库.html";
+        });
+
+        $(".creatGuShi").click(function() {
+            createMain();
+        });
+
+        function roa(arr) //arr为可能出现的元素集合
+        {
+            var temp = []; //temp存放生成的随机数组
+            　
+            var count = arr.length;
+            for (i = 0; i < count; i++) {
+                var num = Math.floor(Math.random() * arr.length); //生成随机数num
+                temp.push(arr[num]); //获取arr[num]并放入temp
+                arr.splice(num, 1);
+            }
+            return temp;
+        }
+
+        function createMain() //arr为可能出现的元素集合
+        {
+            var badChar = "，。？！";
+            $(".container p").remove();
+            var arr = [];
+            var cloneGushiObj = JSON.parse(JSON.stringify(gushiObj));
+            $.each(cloneGushiObj, function(title, value) {
+                $.each(value["content"], function(index1, value1) {
+                    var obj = {};
+                    obj.title = title;
+                    obj.name = value["name"];
+                    obj.time = value["time"];
+                    obj.content = value1;
+                    arr.push(obj);
+                });
+            });
+            arr = roa(arr);
+            // downloadTextFile(JSON.stringify(arr));
+            for (var i = 0; i < 20; i++) {
+                var arrContent = arr[i]["content"];
+                // debugger;
+                var arrAnswerNums = createAnswerNumArr(arrContent);
+                var arrAnswers = [];
+                $.each(arrAnswerNums, function(index, value) {
+                    arrAnswers.push(arrContent[value].replace("，", "").replace("？", "").replace("？", "").replace("。", ""));
+                    if (badChar.indexOf(arrContent[value].charAt(arrContent[value].length - 1)) > -1) {
+                        arrContent[value] = "_____________________" + arrContent[value].charAt(arrContent[value].length - 1);
+                    } else {
+                        arrContent[value] = "_____________________。";
+                    }
+                });
+                var strContent = arrContent.toString().replaceAll(",", "").replaceAll("，，", "，").replaceAll("。。", "。").replaceAll("？？", "？").replaceAll("！！", "！") +
+                    " （《" + arr[i]["title"] + "》 " + arr[i]["name"] + "）";
+                $(".container").append($("<p>").text(strContent));
+                $(".container").append($("<p style='color:red'>").text(arrAnswers.toString().replaceAll(",", " ")));
+            }
+        }
+
+        function createAnswerNumArr(arr) {
+            var cloneArr = JSON.parse(JSON.stringify(arr));
+            var temp = []; //temp存放生成的随机数组
+            var answerNum = Math.floor(cloneArr.length / 2);
+            for (i = 0; i < answerNum; i++) {
+                var num = Math.floor(Math.random() * cloneArr.length); //生成随机数num
+                temp.push(arr.indexOf(cloneArr[num])); //获取arr[num]并放入temp
+                cloneArr.splice(num, 1);
+            }
+            return arrSort(temp);
+        }
+
+        function arrSort(arr) {
+            var asc = function(a, b) {
+                return a - b;
+            }
+            var desc = function(a, b) {
+                return b - a;
+            }
+            return arr.sort(asc);
+        }
+
+        function downloadTextFile(mobileCode, fileName) {
+            fileName = fileName || "test.json";
+            //mobileCode 为写入文件的内容，可以通过获取文本框的value写入
+            var file = new File([mobileCode], fileName, {
+                type: "text/plain;charset=utf-8"
+            });
+            saveAs(file);
+        }
+    </script>
+</body>
+
+</html>
