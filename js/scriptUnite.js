@@ -86,9 +86,9 @@ function createProblem() {
 function downloadProblem() {
     $(".contentFrom").hide();
     createPdfFiles("题目带答案");
-    // $(".answerP").hide();
-    // createPdfFiles("题目");
-    // $(".answerP").show();
+    $(".answerP").hide();
+    createPdfFiles("题目");
+    $(".answerP").show();
     $(".contentFrom").show();
 }
 
