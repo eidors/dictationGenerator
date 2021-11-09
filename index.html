@@ -11,6 +11,7 @@
     <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="js/FileSaver.js"></script>
     <script src="js/七上.js"></script>
+    <script src="js/jspdf.umd.js"></script>
 </head>
 
 <body>
@@ -18,67 +19,65 @@
     <div class="container contentFrom">
         <h2>添加诗词</h2>
         <div class="form-group">
-            <input type="file" id="files" style="display:none" onchange="importFile();"/>
+            <input type="file" id="files" style="display:none" onchange="importFile();" />
             <button type="button" class="btn btn-primary importLibrary" onclick="javascript:importLibrary();">导入库</button>
             <div hidden>
-                <input type="button" id="import" value="导入"/>
+                <input type="button" id="import" value="导入" />
             </div>
             <button type="button" class="btn btn-primary exportLibrary mx-3" onclick="javascript:exportLibrary();">导出库</button>
             <button type="button" class="btn btn-primary removeContent float-right" onclick="javascript:removeContent();">清空</button>
-    
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-                添加诗词
-              </button>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">添加诗词</button>
             <!-- <button type="button" class="btn btn-primary addContent" onclick="javascript:addContent();">添加</button> -->
-            <button type="button" class="btn btn-primary createProblem mx-3" onclick="javascript:createProblem();">生成</button>
+            <button type="button" class="btn btn-primary createProblem mx-3" onclick="javascript:createProblem();">创建题目</button>
+            <button type="button" class="btn btn-primary createProblem mx-3" onclick="javascript:downloadProblem();">下载</button>
         </div>
-        <div class="contentBody">
-        </div>
+        <div class="contentBody" contenteditable="true"></div>
     </div>
     <div class="container">
-        <div class="renderPdf" id="renderPdf" style="background-color: white; color: black; padding: 0 100px;">
-            <div class="problemBody"></div>
+        <div class="renderPdf" id="renderPdf" style="background-color: white;color: black;font-size: 30px; padding-left: 25px; padding-right: 25px;">
+            <div class="problemBody" contenteditable="true"></div>
         </div>
     </div>
-     
+
     <!-- 模态框 -->
     <div class="modal fade" id="myModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-     
-          <!-- 模态框头部 -->
-          <div class="modal-header">
-            <h4 class="modal-title">模态框头部</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-     
-          <!-- 模态框主体 -->
-          <div class="modal-body">
-            <div class="form-group">
-                <label for="title">标题:</label>
-                <input type="text" class="form-control" id="title" placeholder="标题">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">模态框头部</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="title">标题:</label>
+                        <input type="text" class="form-control" id="title" placeholder="标题">
+                    </div>
+                    <div class="form-group">
+                        <label for="author">作者:</label>
+                        <input type="text" class="form-control" id="author" placeholder="作者">
+                    </div>
+                    <div class="form-group">
+                        <label for="years">年代:</label>
+                        <input type="text" class="form-control" id="years" placeholder="年代">
+                    </div>
+                    <div class="form-group">
+                        <label for="content">内容:</label>
+                        <textarea type="text" class="form-control" id="content" placeholder="内容" rows="5"></textarea>
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="javascript:addContent();">提交</button>
+                </div>
+
             </div>
-            <div class="form-group">
-                <label for="author">作者:</label>
-                <input type="text" class="form-control" id="author" placeholder="作者">
-            </div>
-            <div class="form-group">
-                <label for="years">年代:</label>
-                <input type="text" class="form-control" id="years" placeholder="年代">
-            </div>
-            <div class="form-group">
-                <label for="content">内容:</label>
-                <textarea type="text" class="form-control" id="content" placeholder="内容" rows="5"></textarea>
-            </div>
-          </div>
-     
-          <!-- 模态框底部 -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="javascript:addContent();">提交</button>
-          </div>
-     
         </div>
-      </div>
     </div>
 
     <script type="text/javascript" src="./js/html2canvas.js"></script>
@@ -87,5 +86,3 @@
 </body>
 
 </html>
-
-

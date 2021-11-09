@@ -1,4 +1,3 @@
-
 var textHtml = [];
 textHtml.push('<div class="post_right">');
 textHtml.push('<h2 class="post_title1">{title}</h2>');
@@ -80,26 +79,63 @@ function createProblem() {
         var strContent = arrContent.toString().replaceAll(",", "").replaceAll("，，", "，").replaceAll("。。", "。").replaceAll("？？", "？").replaceAll("！！", "！") +
             " （《" + arr[i]["title"] + "》 " + arr[i]["author"] + "）";
         $(".problemBody").append($("<p>").text(strContent));
-        $(".problemBody").append($("<p style='color:red'>").text(arrAnswers.toString().replaceAll(",", " ")));
+        $(".problemBody").append($("<p class='answerP' style='color:red'>").text(arrAnswers.toString().replaceAll(",", " ")));
     }
-    
+}
+
+function downloadProblem() {
     $(".contentFrom").hide();
-    createPdfFiles();
+    createPdfFiles("题目带答案");
+    // $(".answerP").hide();
+    // createPdfFiles("题目");
+    // $(".answerP").show();
     $(".contentFrom").show();
 }
 
-function createPdfFiles(){
+function createPdfFiles(fileName) {
+    // $(".answerP").each(function() {
+    //     if ($(this).position().top > 1710) {
+    //         $(this).css("margin-top", "100px");
+    //     }
+    // });
+
+    fileName = fileName || "content";
+    fileName = fileName + ".pdf";
     html2canvas($(".renderPdf")[0], {
-        onrendered:function(canvas) {
-            //返回图片URL，参数：图片格式和清晰度(0-1)
+        onrendered: function(canvas) {
+            var contentWidth = canvas.width;
+            var contentHeight = canvas.height;
+            //一页pdf显示html页面生成的canvas高度;
+            var pageHeight = contentWidth / 595.28 * 841.89;
+            //未生成pdf的html页面高度
+            var leftHeight = contentHeight;
+            //pdf页面偏移
+            var position = 0;
+            //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+            var imgWidth = 555.28;
+            var imgHeight = 555.28 / contentWidth * contentHeight;
+
             var pageData = canvas.toDataURL('image/jpeg', 1.0);
-            //方向默认竖直，尺寸ponits，格式a4【595.28,841.89]
+
             var pdf = new jsPDF('', 'pt', 'a4');
-            //需要dataUrl格式
-            pdf.addImage(pageData, 'JPEG', 0, 0, 595.28, 592.28/canvas.width * canvas.height );
-            pdf.save('content.pdf');
+            //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+            //当内容未超过pdf一页显示的范围，无需分页
+            if (leftHeight < pageHeight) {
+                pdf.addImage(pageData, 'JPEG', 20, 30, imgWidth, imgHeight);
+            } else {
+                while (leftHeight > 0) {
+                    pdf.addImage(pageData, 'JPEG', 20, position + 30, imgWidth, imgHeight)
+                    leftHeight -= pageHeight;
+                    position -= 841.89;
+                    //避免添加空白页
+                    if (leftHeight > 0) {
+                        pdf.addPage();
+                    }
+                }
+            }
+            pdf.save(fileName);
         }
-    });
+    })
 }
 
 function roa(arr) //arr为可能出现的元素集合
@@ -112,46 +148,6 @@ function roa(arr) //arr为可能出现的元素集合
         arr.splice(num, 1);
     }
     return temp;
-}
-
-function createMain() //arr为可能出现的元素集合
-{
-    var badChar = "，。？！";
-    $(".container p").remove();
-    var arr = [];
-    var cloneGushiObj = JSON.parse(JSON.stringify(gushiObj));
-    $.each(cloneGushiObj, function(title, value) {
-        $.each(value["content"], function(index1, value1) {
-            var obj = {};
-            obj.title = title;
-            obj.author = value["author"];
-            obj.years = value["years"];
-            obj.content = value1;
-            arr.push(obj);
-        });
-    });
-    arr = roa(arr);
-    // downloadTextFile(JSON.stringify(arr));
-    for (var i = 0; i < 20; i++) {
-        if(arr[i]){
-            var arrContent = arr[i]["content"];
-            // debugger;
-            var arrAnswerNums = createAnswerNumArr(arrContent);
-            var arrAnswers = [];
-            $.each(arrAnswerNums, function(index, value) {
-                arrAnswers.push(arrContent[value].replace("，", "").replace("？", "").replace("？", "").replace("。", ""));
-                if (badChar.indexOf(arrContent[value].charAt(arrContent[value].length - 1)) > -1) {
-                    arrContent[value] = "_____________________" + arrContent[value].charAt(arrContent[value].length - 1);
-                } else {
-                    arrContent[value] = "_____________________。";
-                }
-            });
-            var strContent = arrContent.toString().replaceAll(",", "").replaceAll("，，", "，").replaceAll("。。", "。").replaceAll("？？", "？").replaceAll("！！", "！") +
-                " （《" + arr[i]["title"] + "》 " + arr[i]["author"] + "）";
-            $(".container").append($("<p>").text(strContent));
-            $(".container").append($("<p style='color:red'>").text(arrAnswers.toString().replaceAll(",", " ")));
-        }
-    }
 }
 
 function createAnswerNumArr(arr) {
@@ -185,51 +181,37 @@ function downloadTextFile(mobileCode, fileName) {
     saveAs(file);
 }
 
-function exportLibrary(){
-    var badChar = "，。？！";
-    $(".container p").remove();
-    var arr = [];
-    var cloneGushiObj = JSON.parse(JSON.stringify(gushiObj));
-    $.each(cloneGushiObj, function(title, value) {
-        $.each(value["content"], function(index1, value1) {
-            var obj = {};
-            obj.title = title;
-            obj.author = value["author"];
-            obj.years = value["years"];
-            obj.content = value1;
-            arr.push(obj);
-        });
-    });
-    downloadTextFile(JSON.stringify(arr),"Library.json");
+function exportLibrary() {
+    downloadTextFile(JSON.stringify(arrLines), "Library.json");
 }
 
-function removeContent(){
+function removeContent() {
     $(".contentBody").html("");
     arrLines = [];
 }
 
-function importLibrary(){
+function importLibrary() {
     $("#files").click();
 }
 
-function importFile(){
-    var selectedFile = document.getElementById("files").files[0];//获取读取的File对象
-    var name = selectedFile.name;//读取选中文件的文件名
-    var size = selectedFile.size;//读取选中文件的大小
+function importFile() {
+    var selectedFile = document.getElementById("files").files[0]; //获取读取的File对象
+    var name = selectedFile.name; //读取选中文件的文件名
+    var size = selectedFile.size; //读取选中文件的大小
     // console.log("文件名:"+name+"大小："+size);
 
-    var reader = new FileReader();//这里是核心！！！读取操作就是由它完成的。
-    reader.readAsText(selectedFile);//读取文件的内容
+    var reader = new FileReader(); //这里是核心！！！读取操作就是由它完成的。
+    reader.readAsText(selectedFile); //读取文件的内容
 
-    reader.onload = function(){
+    reader.onload = function() {
         // console.log(this.result);//当读取完成之后会回调这个函数，然后此时文件的内容存储到了result中。直接操作即可。
-        arrLines=JSON.parse(this.result);
+        arrLines = JSON.parse(this.result);
     };
     document.getElementById("files").files[0] = "";
 }
 
-$("#export").click(function(){
+$("#export").click(function() {
     var content = "这是直接使用HTML5进行导出的";
-    var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
-    saveAs(blob, "file.txt");//saveAs(blob,filename)
+    var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, "file.txt"); //saveAs(blob,filename)
 });
