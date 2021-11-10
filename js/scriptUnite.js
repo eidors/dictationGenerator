@@ -84,6 +84,7 @@ function createProblem() {
         $(".problemBody").append($("<p>").text(strContent));
         $(".problemBody").append($("<p class='answerP' style='color:red'>").text(arrAnswers.toString().replaceAll(",", " ")));
     }
+    downloadProblem();
 }
 
 function downloadProblem() {
