@@ -54,6 +54,9 @@ function addContent() {
         $contentBody.append(textHtml.join("").replace("{title}", title).replace("{author}", author).replace("{years}", years)
             .replace("{content}", content.replaceAll("\n", '<br>')));
     }
+    $("#myModal input").val("");
+    $("#myModal textarea").val("");
+    alert("Success (:");
 }
 
 function createProblem() {
