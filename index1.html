@@ -65,6 +65,8 @@
                     arr.push(obj);
                 });
             });
+            arrLines = JSON.parse(JSON.stringify(arr));
+            debugger;
             arr = roa(arr);
             // downloadTextFile(JSON.stringify(arr));
             for (var i = 0; i < 20; i++) {
