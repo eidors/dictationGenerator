@@ -66,7 +66,8 @@ function createProblem() {
     var arr = JSON.parse(JSON.stringify(arrLines));
     arr = roa(arr);
     // downloadTextFile(JSON.stringify(arr));
-    for (var i = 0; i < 20; i++) {
+    var valProblemNumber = $(".problemNumber").val();
+    for (var i = 0; i < valProblemNumber; i++) {
         var arrContent = arr[i]["content"];
         // debugger;
         var arrAnswerNums = createAnswerNumArr(arrContent);
