@@ -209,9 +209,18 @@ function importFile() {
 
     reader.onload = function() {
         // console.log(this.result);//当读取完成之后会回调这个函数，然后此时文件的内容存储到了result中。直接操作即可。
-        arrLines = JSON.parse(this.result);
+        // arrLines = JSON.parse(this.result);
+        if (arrLines.length > 0) {
+            var arr1 = JSON.parse(this.result);
+            $.each(arr1, function(index, objLine) {
+                arrLines.push(objLine);
+            });
+        } else {
+            arrLines = JSON.parse(this.result);
+        }
     };
     document.getElementById("files").files[0] = "";
+    alert("导入成功，宝宝 爱你哟！！！");
 }
 
 $("#export").click(function() {
